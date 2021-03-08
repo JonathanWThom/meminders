@@ -62,9 +62,10 @@ func Run() error {
 
 	client := setUpSMSClient()
 
-	w := Watcher{}
-	ctx := context.Background()
-	w.WatchReminders(reminders, client, ctx)
+	w := Watcher{
+		ctx: context.Background(),
+	}
+	w.WatchReminders(reminders, client)
 
 	return nil
 }

@@ -51,16 +51,17 @@ func TestWatcherWatchReminders(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
-			watcher := Watcher{}
+			ctx, cancel := context.WithCancel(context.Background())
+			watcher := Watcher{
+				ctx: ctx,
+			}
 			test.client.On("SendSMS").Return(nil, nil, nil)
 
-			ctx := context.Background()
-			ctx, cancel := context.WithCancel(ctx)
 			go func() {
 				time.Sleep(time.Second * 2)
 				cancel()
 			}()
-			watcher.WatchReminders(test.reminders, test.client, ctx)
+			watcher.WatchReminders(test.reminders, test.client)
 			test.client.AssertCalled(t, "SendSMS")
 		})
 	}

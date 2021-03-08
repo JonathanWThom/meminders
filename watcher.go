@@ -7,14 +7,16 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-type Watcher struct{}
+type Watcher struct {
+	ctx context.Context
+}
 
-func (w *Watcher) WatchReminders(reminders []Reminder, client Sender, ctx context.Context) {
+func (w *Watcher) WatchReminders(reminders []Reminder, client Sender) {
 ticker:
 	for tick := range time.Tick(time.Second * 1) {
 		for _, reminder := range reminders {
 			select {
-			case <-ctx.Done():
+			case <-w.ctx.Done():
 				break ticker
 			default:
 				go func(reminder Reminder) {
