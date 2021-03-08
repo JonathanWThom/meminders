@@ -50,39 +50,67 @@ func main() {
 func Run() error {
 	log.Info("Starting up...")
 
+	db, err := setUpDB()
+	if err != nil {
+		return err
+	}
+
+	reminders, err := getReminders(db)
+	if err != nil {
+		return err
+	}
+
+	client := setUpSMSClient()
+
+	watchReminders(reminders, client)
+
+	return nil
+}
+
+func getReminders(db *gorm.DB) ([]Reminder, error) {
+	log.Info("Fetching reminders from database...")
+	reminders := []Reminder{}
+	if err := db.Find(&reminders).Error; err != nil {
+		return reminders, fmt.Errorf("Failed to fetch data: %v\n", err)
+	}
+	log.Info("Fetched reminders from database")
+
+	return reminders, nil
+}
+
+func setUpDB() (*gorm.DB, error) {
 	log.Info("Connecting to database...")
 	db, err := gorm.Open(sqlite.Open(databaseURL), &gorm.Config{})
 	if err != nil {
-		return fmt.Errorf("Failed to connect to database: %v\n", err)
+		return db, fmt.Errorf("Failed to connect to database: %v\n", err)
 	}
 
 	log.Info("Migrating database...")
 	if err := db.AutoMigrate(&Reminder{}); err != nil {
-		return fmt.Errorf("Failed to migrate reminders table: %v\n", err)
+		return db, fmt.Errorf("Failed to migrate reminders table: %v\n", err)
 	}
 	log.Info("Migrated database")
 
+	return db, nil
+}
+
+func setUpSMSClient() *gotwilio.Twilio {
 	log.Info("Initializing SMS client...")
 	twilio := gotwilio.NewTwilioClient(twilioAccountSID, twilioAuthToken)
 	log.Info("SMS client initialized")
 
-	log.Info("Fetching reminders from database...")
-	reminders := []Reminder{}
-	if err := db.Find(&reminders).Error; err != nil {
-		return fmt.Errorf("Failed to fetch data: %v\n", err)
-	}
-	log.Info("Fetched reminders from database")
+	return twilio
+}
 
+func watchReminders(reminders []Reminder, client Sender) {
 	for tick := range time.Tick(time.Second * 1) {
 		for _, reminder := range reminders {
 			go func(reminder Reminder) {
 				if reminder.MatchesDayAndTime(tick) {
 					log.Info("Reminder triggered: ", reminder)
-					reminder.SendMessage(twilio, twilioFromNumber, twilioToNumber)
+					reminder.SendMessage(client, twilioFromNumber, twilioToNumber)
 				}
 			}(reminder)
 		}
 	}
-
-	return nil
 }
