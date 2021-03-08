@@ -2,7 +2,7 @@ package main
 
 import (
 	"log"
-	"os"
+	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/sfreiberg/gotwilio"
@@ -14,15 +14,6 @@ var (
 	twilioFromNumber,
 	twilioToNumber string
 )
-
-func getenv(name string) string {
-	v := os.Getenv(name)
-	if v == "" {
-		panic("Missing required environment variable: " + name)
-	}
-
-	return v
-}
 
 func init() {
 	err := godotenv.Load(".env")
@@ -36,9 +27,31 @@ func init() {
 	twilioToNumber = getenv("TWILIO_TO_NUMBER")
 }
 
+var reminders = []Reminder{
+	{
+		Message:   "this is my message",
+		Frequency: "Daily",
+		Hour:      20,
+		Minute:    43,
+		Second:    0,
+		Zone:      "America/Los_Angeles",
+	},
+}
+
+type Sender interface {
+	SendSMS(string, string, string, string, string, ...*gotwilio.Option) (*gotwilio.SmsResponse, *gotwilio.Exception, error)
+}
+
 func main() {
-	msg := os.Args[1]
 	twilio := gotwilio.NewTwilioClient(twilioAccountSID, twilioAuthToken)
 
-	twilio.SendSMS(twilioFromNumber, twilioToNumber, msg, "", "")
+	for tick := range time.Tick(time.Second * 1) {
+		for _, reminder := range reminders {
+			go func(reminder Reminder) {
+				if reminder.MatchesTime(tick) {
+					reminder.SendMessage(twilio, twilioFromNumber, twilioToNumber)
+				}
+			}(reminder)
+		}
+	}
 }
