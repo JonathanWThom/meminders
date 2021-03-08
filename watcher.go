@@ -14,11 +14,11 @@ type Watcher struct {
 func (w *Watcher) WatchReminders(reminders []Reminder, client Sender) {
 ticker:
 	for tick := range time.Tick(time.Second * 1) {
-		for _, reminder := range reminders {
-			select {
-			case <-w.ctx.Done():
-				break ticker
-			default:
+		select {
+		case <-w.ctx.Done():
+			break ticker
+		default:
+			for _, reminder := range reminders {
 				go func(reminder Reminder) {
 					if reminder.MatchesDayAndTime(tick) {
 						log.Info("Reminder triggered: ", reminder)

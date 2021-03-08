@@ -21,6 +21,10 @@ var (
 	twilioToNumber string
 )
 
+var watcher = Watcher{
+	ctx: context.Background(),
+}
+
 func init() {
 	err := godotenv.Load(".env")
 	if err != nil {
@@ -62,10 +66,7 @@ func Run() error {
 
 	client := setUpSMSClient()
 
-	w := Watcher{
-		ctx: context.Background(),
-	}
-	w.WatchReminders(reminders, client)
+	watcher.WatchReminders(reminders, client)
 
 	return nil
 }

@@ -2,20 +2,12 @@ package main
 
 import (
 	"context"
-	"io/ioutil"
-	"os"
 	"testing"
 	"time"
 
 	"github.com/sfreiberg/gotwilio"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/mock"
 )
-
-func TestMain(m *testing.M) {
-	log.SetOutput(ioutil.Discard)
-	os.Exit(m.Run())
-}
 
 type SenderMock struct {
 	mock.Mock
