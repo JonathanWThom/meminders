@@ -4,10 +4,13 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
+	"gorm.io/gorm"
 )
 
 // add some validations
 type Reminder struct {
+	gorm.Model
+
 	Message   string
 	Frequency string
 	Day       int
