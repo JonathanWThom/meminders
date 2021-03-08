@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // add some validations
@@ -40,7 +41,7 @@ func (r *Reminder) MatchesTime(t time.Time) bool {
 func (r *Reminder) MatchesDayAndTime(tick time.Time) bool {
 	locale, err := time.LoadLocation(r.Zone)
 	if err != nil {
-		fmt.Println(err)
+		log.Error("Failed to set local time: ", err)
 		return false
 	}
 	t := tick.In(locale)
@@ -50,4 +51,5 @@ func (r *Reminder) MatchesDayAndTime(tick time.Time) bool {
 
 func (r *Reminder) SendMessage(sender Sender, from string, to string) {
 	sender.SendSMS(from, to, r.Message, "", "")
+	log.Info("Reminder sent: ", *r)
 }

@@ -1,11 +1,13 @@
 package main
 
 import (
-	"log"
+	"os"
 	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/sfreiberg/gotwilio"
+
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -25,14 +27,17 @@ func init() {
 	twilioAuthToken = getenv("TWILIO_AUTH_TOKEN")
 	twilioFromNumber = getenv("TWILIO_FROM_NUMBER")
 	twilioToNumber = getenv("TWILIO_TO_NUMBER")
+
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
 }
 
 var reminders = []Reminder{
 	{
 		Message:   "this is my message",
 		Frequency: "Daily",
-		Hour:      20,
-		Minute:    43,
+		Hour:      21,
+		Minute:    24,
 		Second:    0,
 		Zone:      "America/Los_Angeles",
 	},
@@ -43,12 +48,15 @@ type Sender interface {
 }
 
 func main() {
+	log.Info("Starting up...")
 	twilio := gotwilio.NewTwilioClient(twilioAccountSID, twilioAuthToken)
+	log.Info("SMS client initialized")
 
 	for tick := range time.Tick(time.Second * 1) {
 		for _, reminder := range reminders {
 			go func(reminder Reminder) {
 				if reminder.MatchesDayAndTime(tick) {
+					log.Info("Reminder triggered: ", reminder)
 					reminder.SendMessage(twilio, twilioFromNumber, twilioToNumber)
 				}
 			}(reminder)
