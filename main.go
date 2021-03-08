@@ -48,7 +48,7 @@ func main() {
 	for tick := range time.Tick(time.Second * 1) {
 		for _, reminder := range reminders {
 			go func(reminder Reminder) {
-				if reminder.MatchesTime(tick) {
+				if reminder.MatchesDayAndTime(tick) {
 					reminder.SendMessage(twilio, twilioFromNumber, twilioToNumber)
 				}
 			}(reminder)
