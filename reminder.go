@@ -50,6 +50,11 @@ func (r *Reminder) MatchesDayAndTime(tick time.Time) bool {
 }
 
 func (r *Reminder) SendMessage(sender Sender, from string, to string) {
-	sender.SendSMS(from, to, r.Message, "", "")
+	_, _, err := sender.SendSMS(from, to, r.Message, "", "")
+	if err != nil {
+		log.Error("Failed to send reminder: ", err)
+		return
+	}
+
 	log.Info("Reminder sent: ", *r)
 }
