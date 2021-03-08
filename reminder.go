@@ -5,12 +5,10 @@ import (
 	"time"
 )
 
-type Frequency string
-
 // add some validations
 type Reminder struct {
-	Message string
-	Frequency
+	Message   string
+	Frequency string
 	Day       int
 	DayOfWeek string
 	Hour      int
