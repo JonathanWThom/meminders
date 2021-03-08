@@ -1,9 +1,9 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/joho/godotenv"
 	"github.com/sfreiberg/gotwilio"
@@ -62,7 +62,9 @@ func Run() error {
 
 	client := setUpSMSClient()
 
-	watchReminders(reminders, client)
+	w := Watcher{}
+	ctx := context.Background()
+	w.WatchReminders(reminders, client, ctx)
 
 	return nil
 }
@@ -100,17 +102,4 @@ func setUpSMSClient() *gotwilio.Twilio {
 	log.Info("SMS client initialized")
 
 	return twilio
-}
-
-func watchReminders(reminders []Reminder, client Sender) {
-	for tick := range time.Tick(time.Second * 1) {
-		for _, reminder := range reminders {
-			go func(reminder Reminder) {
-				if reminder.MatchesDayAndTime(tick) {
-					log.Info("Reminder triggered: ", reminder)
-					reminder.SendMessage(client, twilioFromNumber, twilioToNumber)
-				}
-			}(reminder)
-		}
-	}
 }

@@ -59,5 +59,5 @@ func (r *Reminder) SendMessage(sender Sender, from string, to string) {
 		return
 	}
 
-	log.Info("Reminder sent: ", *r)
+	log.Info("Reminder sent: ", r)
 }

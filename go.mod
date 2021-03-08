@@ -9,7 +9,8 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.6 // indirect
 	github.com/sfreiberg/gotwilio v0.0.0-20201211181435-c426a3710ab5
 	github.com/sirupsen/logrus v1.8.0
-	golang.org/x/sys v0.0.0-20210305230114-8fe3ee5dd75b // indirect
+	github.com/stretchr/testify v1.7.0
+	golang.org/x/sys v0.0.0-20210308170721-88b6017d0656 // indirect
 	gorm.io/driver/sqlite v1.1.4
-	gorm.io/gorm v1.21.2
+	gorm.io/gorm v1.21.3
 )
