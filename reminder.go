@@ -21,7 +21,7 @@ type Reminder struct {
 	Zone      string
 }
 
-func (r *Reminder) MatchesDay(t time.Time) bool {
+func (r *Reminder) matchesDay(t time.Time) bool {
 	if r.Frequency == "Daily" {
 		return true
 	}
@@ -37,7 +37,7 @@ func (r *Reminder) MatchesDay(t time.Time) bool {
 	return false
 }
 
-func (r *Reminder) MatchesTime(t time.Time) bool {
+func (r *Reminder) matchesTime(t time.Time) bool {
 	return r.Hour == t.Hour() && r.Minute == t.Minute() && r.Second == t.Second()
 }
 
@@ -49,7 +49,7 @@ func (r *Reminder) MatchesDayAndTime(tick time.Time) bool {
 	}
 	t := tick.In(locale)
 
-	return r.MatchesDay(t) && r.MatchesTime(t)
+	return r.matchesDay(t) && r.matchesTime(t)
 }
 
 func (r *Reminder) SendMessage(sender Sender, from string, to string) {
