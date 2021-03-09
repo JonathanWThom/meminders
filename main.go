@@ -83,7 +83,7 @@ func getReminders(db *gorm.DB) ([]Reminder, error) {
 }
 
 func setUpDB() (*gorm.DB, error) {
-	log.Info("Connecting to database: %v...", databaseURL)
+	log.Info("Connecting to database " + databaseURL + "...")
 	db, err := gorm.Open(sqlite.Open(databaseURL), &gorm.Config{})
 	if err != nil {
 		return db, fmt.Errorf("Failed to connect to database: %v\n", err)
