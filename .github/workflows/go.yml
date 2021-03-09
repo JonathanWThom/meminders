@@ -1,7 +1,7 @@
 name: CI
 
 env:
-  REGISTRY: "registry.digitalocean.com"
+  REGISTRY: "docker.pkg.github.com"
   ORG: "jonathanwthom"
   IMAGE_NAME: "meminders"
 
@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build container image
-        run: docker build -t $(echo $ORG)/$(echo $IMAGE_NAME) .
+        run: docker build -t jonathanwthom/meminders .
 
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v1
@@ -43,7 +43,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: $(echo $ORG)/$(echo $IMAGE_NAME)
+          repository: jonathanwthom/meminders
           tag_with_ref: true
 
   deploy:
