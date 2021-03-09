@@ -35,7 +35,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build container image
-        run: docker build -t jonathanwthom/meminders .
+        run: docker build -t jonathanwthom/meminders/meminders .
 
       - name: Push to GitHub Packages
         uses: docker/build-push-action@v1
@@ -43,7 +43,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
-          repository: jonathanwthom/meminders
+          repository: jonathanwthom/meminders/meminders
           tag_with_ref: true
 
   deploy:
@@ -75,4 +75,4 @@ jobs:
             --name $(echo $IMAGE_NAME) \
             -v $(pwd)/$(echo $DATABASE_URL):/app/$(echo $DATABASE_URL) \
             -v $(pwd)/.env.production:/app/.env.production \
-            $(echo $REGISTRY)/$(echo ORG)/$(echo $IMAGE_NAME)
+            $(echo $REGISTRY)/$(echo ORG)/$(echo $IMAGE_NAME)/$(echo $IMAGE_NAME)
