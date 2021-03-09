@@ -26,10 +26,12 @@ var watcher = Watcher{
 }
 
 func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading environment file")
+	env := os.Getenv("MEMINDERS_ENV")
+	if "" == env {
+		env = "development"
 	}
+	godotenv.Load(".env." + env)
+	godotenv.Load()
 
 	databaseURL = getenv("DATABASE_URL")
 	twilioAccountSID = getenv("TWILIO_ACCOUNT_SID")

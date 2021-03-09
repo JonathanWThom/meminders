@@ -10,12 +10,7 @@ import (
 )
 
 func TestMain(m *testing.M) {
-	databaseURL = "file::memory:?cache=shared"
-	twilioAccountSID = ""
-	twilioAuthToken = ""
-	twilioFromNumber = ""
-	twilioToNumber = ""
-
+	os.Setenv("MEMINDERS_ENV", "test")
 	log.SetOutput(ioutil.Discard)
 	os.Exit(m.Run())
 }
