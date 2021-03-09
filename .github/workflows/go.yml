@@ -60,7 +60,6 @@ jobs:
           KEY: ${{ secrets.SSHKEY }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
           envs: IMAGE_NAME,REGISTRY
-          env:
             TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           script: |
             # log in to doctl registry.. again
