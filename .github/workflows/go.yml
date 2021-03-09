@@ -47,30 +47,30 @@ jobs:
       - name: Push image to DigitalOcean Container Registry
         run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
 
-    deploy:
-      runs-on: ubuntu-latest
-      needs: build_and_push
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build_and_push
 
-      steps:
-        - name: Deploy to Digital Ocean droplet via SSH action
-          uses: appleboy/ssh-action@v0.1.3
-          with:
-            HOST: ${{ secrets.HOST }}
-            USERNAME: ${{ secrets.USERNAME }}
-            KEY: ${{ secrets.SSHKEY }}
-            PASSPHRASE: ${{ secrets.PASSPHRASE }}
-            PASSWORD: ${{ secrets.PASSWORD }}
-            envs: IMAGE_NAME,REGISTRY,GITHUB_SHA
-            script: |
-              # Stop running container
-              sudo docker stop $(echo $IMAGE_NAME)
+    steps:
+      - name: Deploy to Digital Ocean droplet via SSH action
+        uses: appleboy/ssh-action@v0.1.3
+        with:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          KEY: ${{ secrets.SSHKEY }}
+          PASSPHRASE: ${{ secrets.PASSPHRASE }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA
+          script: |
+            # Stop running container
+            sudo docker stop $(echo $IMAGE_NAME)
 
-              # Remove old container
-              sudo docker rm $(echo $IMAGE_NAME)
+            # Remove old container
+            sudo docker rm $(echo $IMAGE_NAME)
 
-              # Run a new container from a new image
-              sudo docker run -d \
-              --restart always \
-              --env-file .env \
-              --name $(echo $IMAGE_NAME) \
-              $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+            # Run a new container from a new image
+            sudo docker run -d \
+            --restart always \
+            --env-file .env \
+            --name $(echo $IMAGE_NAME) \
+            $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
