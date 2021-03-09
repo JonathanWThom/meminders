@@ -31,7 +31,7 @@ func init() {
 		env = "development"
 	}
 	if err := godotenv.Load(".env." + env); err != nil {
-		log.Fatal("Error loading environment file")
+		log.Fatal("Error loading environment file for env: ", env)
 	}
 
 	databaseURL = getenv("DATABASE_URL")
