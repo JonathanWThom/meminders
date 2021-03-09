@@ -17,10 +17,10 @@ jobs:
         go-version: 1.15
   
     - name: Run golangci-lint
-      uses: golangci/golangci-lint-action@v2.5.1
+      uses: make lint
 
     - name: Test
-      run: go test -v ./...
+      run: make test
 
     - name: Build
       run: go build -v ./...
