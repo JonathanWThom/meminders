@@ -3,10 +3,11 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/url"
 	"os"
 
 	"github.com/joho/godotenv"
-	"github.com/sfreiberg/gotwilio"
+	"github.com/kevinburke/twilio-go"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 
@@ -26,7 +27,7 @@ var watcher = Watcher{
 }
 
 type Sender interface {
-	SendSMS(string, string, string, string, string, ...*gotwilio.Option) (*gotwilio.SmsResponse, *gotwilio.Exception, error)
+	SendMessage(string, string, string, []*url.URL) (*twilio.Message, error)
 }
 
 func init() {
@@ -103,10 +104,10 @@ func setUpDB() (*gorm.DB, error) {
 	return db, nil
 }
 
-func setUpSMSClient() *gotwilio.Twilio {
+func setUpSMSClient() *twilio.MessageService {
 	log.Info("Initializing SMS client...")
-	twilio := gotwilio.NewTwilioClient(twilioAccountSID, twilioAuthToken)
+	client := twilio.NewClient(twilioAccountSID, twilioAuthToken, nil)
 	log.Info("SMS client initialized")
 
-	return twilio
+	return client.Messages
 }

@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
+	"net/url"
 	"testing"
 	"time"
 
-	"github.com/sfreiberg/gotwilio"
+	"github.com/kevinburke/twilio-go"
 	"github.com/stretchr/testify/mock"
 )
 
@@ -13,9 +14,9 @@ type SenderMock struct {
 	mock.Mock
 }
 
-func (m *SenderMock) SendSMS(a string, b string, c string, d string, e string, f ...*gotwilio.Option) (*gotwilio.SmsResponse, *gotwilio.Exception, error) {
+func (m *SenderMock) SendMessage(string, string, string, []*url.URL) (*twilio.Message, error) {
 	m.Called()
-	return nil, nil, nil
+	return &twilio.Message{}, nil
 }
 
 func TestWatcherWatchReminders(t *testing.T) {
@@ -47,14 +48,14 @@ func TestWatcherWatchReminders(t *testing.T) {
 			watcher := Watcher{
 				ctx: ctx,
 			}
-			test.client.On("SendSMS").Return(nil, nil, nil)
+			test.client.On("SendMessage").Return(&twilio.Message{}, nil)
 
 			go func() {
 				time.Sleep(time.Second * 2)
 				cancel()
 			}()
 			watcher.WatchReminders(test.reminders, test.client)
-			test.client.AssertCalled(t, "SendSMS")
+			test.client.AssertCalled(t, "SendMessage")
 		})
 	}
 }
