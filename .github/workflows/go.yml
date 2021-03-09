@@ -56,12 +56,13 @@ jobs:
         uses: appleboy/ssh-action@v0.1.3
         env:
           TOKEN: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
         with:
           HOST: ${{ secrets.HOST }}
           USERNAME: ${{ secrets.USERNAME }}
           KEY: ${{ secrets.SSHKEY }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-          envs: IMAGE_NAME,REGISTRY,TOKEN
+          envs: IMAGE_NAME,REGISTRY,TOKEN,DATABASE_URL
           script: |
             # log in to doctl registry.. again
             # not quite working, not getting token
@@ -78,4 +79,6 @@ jobs:
             --restart always \
             --env-file .env.production \
             --name $(echo $IMAGE_NAME) \
+            -v $(pwd)/$(echo $DATABASE_URL):/app/$(echo $DATABASE_URL) \
+            -v $(pwd)/.env.production:/app/.env.production \
             $(echo $REGISTRY)/$(echo $IMAGE_NAME)
