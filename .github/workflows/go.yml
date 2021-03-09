@@ -44,7 +44,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           registry: docker.pkg.github.com
           repository: jonathanwthom/meminders/meminders
-          tags: jonathanwthom/meminders/meminders:latest
+          tags: latest
 
   deploy:
     runs-on: ubuntu-latest
