@@ -75,4 +75,4 @@ jobs:
             --name $(echo $IMAGE_NAME) \
             -v $(pwd)/$(echo $DATABASE_URL):/app/$(echo $DATABASE_URL) \
             -v $(pwd)/.env.production:/app/.env.production \
-            $(echo $REGISTRY)/$(echo ORG)/$(echo $IMAGE_NAME)/$(echo $IMAGE_NAME)
+            docker.pkg.github.com/jonathanwthom/meminders/meminders
