@@ -45,7 +45,7 @@ jobs:
         run: doctl registry login --expiry-seconds 600
 
       - name: Push image to DigitalOcean Container Registry
-        run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+        run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
 
   deploy:
     runs-on: ubuntu-latest
@@ -59,7 +59,7 @@ jobs:
           USERNAME: ${{ secrets.USERNAME }}
           KEY: ${{ secrets.SSHKEY }}
           PASSPHRASE: ${{ secrets.PASSPHRASE }}
-          envs: IMAGE_NAME,REGISTRY,GITHUB_SHA
+          envs: IMAGE_NAME,REGISTRY
           script: |
             # Stop running container
             docker stop $(echo $IMAGE_NAME)
@@ -72,4 +72,4 @@ jobs:
             --restart always \
             --env-file .env.production \
             --name $(echo $IMAGE_NAME) \
-            $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
+            $(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
