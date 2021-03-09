@@ -25,7 +25,25 @@ var watcher = Watcher{
 	ctx: context.Background(),
 }
 
+type Sender interface {
+	SendSMS(string, string, string, string, string, ...*gotwilio.Option) (*gotwilio.SmsResponse, *gotwilio.Exception, error)
+}
+
 func init() {
+	log.SetFormatter(&log.JSONFormatter{})
+	log.SetOutput(os.Stdout)
+}
+
+func main() {
+	if err := Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func Run() error {
+	log.Info("Starting up...")
+
+	log.Info("Parsing environment...")
 	env := os.Getenv("MEMINDERS_ENV")
 	if "" == env {
 		env = "development"
@@ -39,23 +57,7 @@ func init() {
 	twilioAuthToken = getenv("TWILIO_AUTH_TOKEN")
 	twilioFromNumber = getenv("TWILIO_FROM_NUMBER")
 	twilioToNumber = getenv("TWILIO_TO_NUMBER")
-
-	log.SetFormatter(&log.JSONFormatter{})
-	log.SetOutput(os.Stdout)
-}
-
-type Sender interface {
-	SendSMS(string, string, string, string, string, ...*gotwilio.Option) (*gotwilio.SmsResponse, *gotwilio.Exception, error)
-}
-
-func main() {
-	if err := Run(); err != nil {
-		log.Fatal(err)
-	}
-}
-
-func Run() error {
-	log.Info("Starting up...")
+	log.Info("Environment parsed...")
 
 	db, err := setUpDB()
 	if err != nil {
