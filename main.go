@@ -30,8 +30,9 @@ func init() {
 	if "" == env {
 		env = "development"
 	}
-	godotenv.Load(".env." + env)
-	godotenv.Load()
+	if err := godotenv.Load(".env." + env); err != nil {
+		log.Fatal("Error loading environment file")
+	}
 
 	databaseURL = getenv("DATABASE_URL")
 	twilioAccountSID = getenv("TWILIO_ACCOUNT_SID")
