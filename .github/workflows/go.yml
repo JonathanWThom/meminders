@@ -45,7 +45,7 @@ jobs:
         run: doctl registry login --expiry-seconds 600
 
       - name: Push image to DigitalOcean Container Registry
-        run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
+        run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME)
 
   deploy:
     runs-on: ubuntu-latest
@@ -72,4 +72,4 @@ jobs:
             --restart always \
             --env-file .env.production \
             --name $(echo $IMAGE_NAME) \
-            $(echo $REGISTRY)/$(echo $IMAGE_NAME):latest
+            $(echo $REGISTRY)/$(echo $IMAGE_NAME)
