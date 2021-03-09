@@ -59,16 +59,17 @@ jobs:
             USERNAME: ${{ secrets.USERNAME }}
             KEY: ${{ secrets.SSHKEY }}
             PASSPHRASE: ${{ secrets.PASSPHRASE }}
+            PASSWORD: ${{ secrets.PASSWORD }}
             envs: IMAGE_NAME,REGISTRY,GITHUB_SHA
             script: |
               # Stop running container
-              docker stop $(echo $IMAGE_NAME)
+              sudo docker stop $(echo $IMAGE_NAME)
 
               # Remove old container
-              docker rm $(echo $IMAGE_NAME)
+              sudo docker rm $(echo $IMAGE_NAME)
 
               # Run a new container from a new image
-              docker run -d \
+              sudo docker run -d \
               --restart always \
               --env-file .env \
               --name $(echo $IMAGE_NAME) \
