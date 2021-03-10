@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"net/url"
 	"os"
 
@@ -31,6 +32,19 @@ var watcher = Watcher{
 
 var db *gorm.DB
 
+type Router interface {
+	Run(...string) error
+	ServeHTTP(http.ResponseWriter, *http.Request)
+}
+
+type Config interface {
+	buildRouter() Router
+}
+
+type config struct{}
+
+var appConfig Config
+
 type Sender interface {
 	SendMessage(string, string, string, []*url.URL) (*twilio.Message, error)
 }
@@ -41,6 +55,7 @@ func init() {
 }
 
 func main() {
+	appConfig = &config{}
 	if err := Run(); err != nil {
 		log.Fatal(err)
 	}
@@ -83,7 +98,7 @@ func Run() error {
 
 	client := setUpSMSClient()
 
-	router := buildRouter()
+	router := appConfig.buildRouter()
 	go router.Run()
 	log.Info("Routes built and serving on port :8080")
 
@@ -92,7 +107,7 @@ func Run() error {
 	return nil
 }
 
-func buildRouter() *gin.Engine {
+func (c *config) buildRouter() Router {
 	log.Info("Building routes...")
 	router := gin.Default()
 	authorized := router.Group("/", gin.BasicAuth(gin.Accounts{

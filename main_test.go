@@ -18,9 +18,25 @@ func TestMain(m *testing.M) {
 	os.Exit(m.Run())
 }
 
+type mockConfig struct{}
+
+func (m *mockConfig) buildRouter() Router {
+	return &mockRouter{}
+}
+
+type mockRouter struct{}
+
+func (m *mockRouter) Run(...string) error {
+	return nil
+}
+func (m *mockRouter) ServeHTTP(http.ResponseWriter, *http.Request) {}
+
 func TestRun(t *testing.T) {
 	originalWatcher := watcher
 	defer func() { watcher = originalWatcher }()
+	oldAppConfig := appConfig
+	defer func() { appConfig = oldAppConfig }()
+	appConfig = &mockConfig{}
 
 	tests := []struct {
 		description string
@@ -49,6 +65,10 @@ func TestRun(t *testing.T) {
 }
 
 func TestRouter(t *testing.T) {
+	oldAppConfig := appConfig
+	defer func() { appConfig = oldAppConfig }()
+	appConfig = &config{}
+
 	tests := []struct {
 		authorization bool
 		description   string
@@ -75,7 +95,7 @@ func TestRouter(t *testing.T) {
 
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
-			srv := httptest.NewServer(buildRouter())
+			srv := httptest.NewServer(appConfig.buildRouter())
 			defer srv.Close()
 
 			client := &http.Client{}

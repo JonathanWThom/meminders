@@ -1,6 +1,9 @@
 run:
 	go run ./...
 
+build:
+	go build ./...
+
 docker-build:
 	docker build -t jonathanwthom/meminders:latest .
 
