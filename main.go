@@ -79,9 +79,13 @@ func Run() error {
 
 	client := setUpSMSClient()
 
+	// extract me to package or function
 	log.Info("Building routes...")
 	router := gin.Default()
-	router.POST("/reminders", postReminders)
+	authorized := router.Group("/", gin.BasicAuth(gin.Accounts{
+		"foo": "bar", // change me
+	}))
+	authorized.POST("/reminders", postReminders)
 	port := ":8080"
 	// don't actually connect for tests
 	go router.Run(port)
