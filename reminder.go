@@ -37,7 +37,7 @@ func postReminders(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create reminder"})
 	}
 
-	c.JSON(http.StatusOK, &reminder)
+	c.JSON(http.StatusCreated, &reminder)
 }
 
 func getReminders(db *gorm.DB) ([]Reminder, error) {

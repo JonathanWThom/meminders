@@ -16,6 +16,8 @@ import (
 )
 
 var (
+	adminPassword,
+	adminUsername,
 	databaseURL,
 	twilioAccountSID,
 	twilioAuthToken,
@@ -56,6 +58,8 @@ func Run() error {
 		log.Fatal("Error loading environment file for env: ", env)
 	}
 
+	adminPassword = getenv("ADMIN_PASSWORD")
+	adminUsername = getenv("ADMIN_USERNAME")
 	databaseURL = getenv("DATABASE_URL")
 	twilioAccountSID = getenv("TWILIO_ACCOUNT_SID")
 	twilioAuthToken = getenv("TWILIO_AUTH_TOKEN")
@@ -79,21 +83,24 @@ func Run() error {
 
 	client := setUpSMSClient()
 
-	// extract me to package or function
-	log.Info("Building routes...")
-	router := gin.Default()
-	authorized := router.Group("/", gin.BasicAuth(gin.Accounts{
-		"foo": "bar", // change me
-	}))
-	authorized.POST("/reminders", postReminders)
-	port := ":8080"
-	// don't actually connect for tests
-	go router.Run(port)
-	log.Info("Routes built and serving on port: ", port)
+	router := buildRouter()
+	go router.Run()
+	log.Info("Routes built and serving on port :8080")
 
 	watcher.WatchReminders(reminders, client)
 
 	return nil
+}
+
+func buildRouter() *gin.Engine {
+	log.Info("Building routes...")
+	router := gin.Default()
+	authorized := router.Group("/", gin.BasicAuth(gin.Accounts{
+		adminUsername: adminPassword,
+	}))
+	authorized.POST("/reminders", postReminders)
+
+	return router
 }
 
 func setUpDB() (*gorm.DB, error) {
