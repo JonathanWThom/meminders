@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/kevinburke/twilio-go"
 	"gorm.io/driver/sqlite"
@@ -25,6 +26,8 @@ var (
 var watcher = Watcher{
 	ctx: context.Background(),
 }
+
+var db *gorm.DB
 
 type Sender interface {
 	SendMessage(string, string, string, []*url.URL) (*twilio.Message, error)
@@ -58,9 +61,13 @@ func Run() error {
 	twilioAuthToken = getenv("TWILIO_AUTH_TOKEN")
 	twilioFromNumber = getenv("TWILIO_FROM_NUMBER")
 	twilioToNumber = getenv("TWILIO_TO_NUMBER")
+	if env != "development" {
+		gin.SetMode(gin.ReleaseMode)
+	}
 	log.Info("Environment parsed...")
 
-	db, err := setUpDB()
+	var err error
+	db, err = setUpDB()
 	if err != nil {
 		return err
 	}
@@ -72,20 +79,17 @@ func Run() error {
 
 	client := setUpSMSClient()
 
+	log.Info("Building routes...")
+	router := gin.Default()
+	router.POST("/reminders", postReminders)
+	port := ":8080"
+	// don't actually connect for tests
+	go router.Run(port)
+	log.Info("Routes built and serving on port: ", port)
+
 	watcher.WatchReminders(reminders, client)
 
 	return nil
-}
-
-func getReminders(db *gorm.DB) ([]Reminder, error) {
-	log.Info("Fetching reminders from database...")
-	reminders := []Reminder{}
-	if err := db.Find(&reminders).Error; err != nil {
-		return reminders, fmt.Errorf("Failed to fetch data: %v\n", err)
-	}
-	log.Info("Fetched reminders from database")
-
-	return reminders, nil
 }
 
 func setUpDB() (*gorm.DB, error) {
