@@ -60,6 +60,18 @@ func TestReminderMatchesDayAndTime(t *testing.T) {
 			reminder:    Reminder{Frequency: Monthly, Day: now.Day(), Hour: 1, Minute: 1, Second: 1, Zone: zone},
 			time:        time.Date(year, month, now.Day()+1, 1, 1, 1, 0, location),
 		},
+		{
+			description: "Reminder is Once and time, day, month, and year all match",
+			expected:    true,
+			reminder:    Reminder{Frequency: Once, Day: now.Day(), Month: month.String(), Year: year, Hour: 1, Minute: 1, Second: 1, Zone: zone},
+			time:        time.Date(year, month, now.Day(), 1, 1, 1, 0, location),
+		},
+		{
+			description: "Reminder is Once and time, day, and month matches but year does not",
+			expected:    false,
+			reminder:    Reminder{Frequency: Once, Day: now.Day(), Month: month.String(), Year: year, Hour: 1, Minute: 1, Second: 1, Zone: zone},
+			time:        time.Date(year+1, month, now.Day(), 1, 1, 1, 0, location),
+		},
 	}
 
 	for _, test := range tests {
@@ -86,7 +98,7 @@ func TestPostReminders(t *testing.T) {
 		remindersCount int
 	}{
 		{
-			description: "It returns 201 and creates a reminder when valid parameters are passed",
+			description: "Valid parameters are passed",
 			params: map[string]interface{}{
 				"message":   "test message",
 				"frequency": "Daily",
@@ -96,6 +108,18 @@ func TestPostReminders(t *testing.T) {
 			},
 			statusCode:     201,
 			remindersCount: 1,
+		},
+		{
+			description: "Invalid frequnecy is passed",
+			params: map[string]interface{}{
+				"message":   "test message",
+				"frequency": "Dailyyyyyy",
+				"hour":      1,
+				"minute":    2,
+				"zone":      "America/Los_Angeles",
+			},
+			statusCode:     400,
+			remindersCount: 0,
 		},
 	}
 
