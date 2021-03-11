@@ -79,5 +79,5 @@ jobs:
             --name $(echo $IMAGE_NAME) \
             -v $(pwd)/$(echo $DATABASE_URL):/app/$(echo $DATABASE_URL) \
             -v $(pwd)/.env.production:/app/.env.production \
-            -p 8080:8080 \
+            -p 80:8080 \
             docker.pkg.github.com/jonathanwthom/meminders/meminders
