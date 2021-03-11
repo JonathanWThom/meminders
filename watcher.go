@@ -8,17 +8,18 @@ import (
 )
 
 type Watcher struct {
-	ctx context.Context
+	ctx       context.Context
+	reminders []Reminder
 }
 
-func (w *Watcher) WatchReminders(reminders []Reminder, client Sender) {
+func (w *Watcher) WatchReminders(client Sender) {
 ticker:
 	for tick := range time.Tick(time.Second * 1) {
 		select {
 		case <-w.ctx.Done():
 			break ticker
 		default:
-			for _, reminder := range reminders {
+			for _, reminder := range w.reminders {
 				go func(reminder Reminder) {
 					if reminder.MatchesDayAndTime(tick) {
 						log.Info("Reminder triggered: ", reminder)

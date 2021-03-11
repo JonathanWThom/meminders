@@ -54,7 +54,8 @@ func TestWatcherWatchReminders(t *testing.T) {
 				time.Sleep(time.Second * 2)
 				cancel()
 			}()
-			watcher.WatchReminders(test.reminders, test.client)
+			watcher.reminders = test.reminders
+			watcher.WatchReminders(test.client)
 			test.client.AssertCalled(t, "SendMessage")
 		})
 	}

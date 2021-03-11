@@ -26,6 +26,8 @@ var (
 	twilioToNumber string
 )
 
+// TODO: Refactor many of these global vars into config if possible
+
 var watcher = Watcher{
 	ctx: context.Background(),
 }
@@ -91,18 +93,21 @@ func Run() error {
 		return err
 	}
 
+	client := setUpSMSClient()
+
 	reminders, err := getReminders(db)
 	if err != nil {
 		return err
 	}
-
-	client := setUpSMSClient()
+	watcher.reminders = reminders
+	go watcher.WatchReminders(client)
 
 	router := appConfig.buildRouter()
-	go router.Run()
 	log.Info("Routes built and serving on port :8080")
-
-	watcher.WatchReminders(reminders, client)
+	err = router.Run()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }

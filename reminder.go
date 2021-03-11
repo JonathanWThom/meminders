@@ -37,6 +37,16 @@ func postReminders(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, &reminder)
+	resetWatcher()
+}
+
+func resetWatcher() {
+	reminders, err := getReminders(db)
+	if err != nil {
+		log.Error("Failed to refetch reminders: ", err)
+		return
+	}
+	watcher.reminders = reminders
 }
 
 func getReminders(db *gorm.DB) ([]Reminder, error) {

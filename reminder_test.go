@@ -133,6 +133,10 @@ func TestPostReminders(t *testing.T) {
 			if remindersAdded != test.remindersCount {
 				t.Errorf("postReminders expected %v reminders,  got %v", test.remindersCount, len(reminders))
 			}
+
+			if len(watcher.reminders) != len(reminders) {
+				t.Errorf("Watcher reminders length expected to be %v, got %v", len(reminders), len(watcher.reminders))
+			}
 		})
 	}
 }
