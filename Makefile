@@ -8,7 +8,7 @@ docker-build:
 	docker build -t jonathanwthom/meminders:latest .
 
 docker-run:
-	docker run --rm -v $(shell pwd)/meminders-dev.db:/app/meminders-dev.db jonathanwthom/meminders
+	docker run --rm -v $(shell pwd)/meminders-dev.db:/app/meminders-dev.db -p 80:8080 jonathanwthom/meminders
 
 lint:
 	golangci-lint run

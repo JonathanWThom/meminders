@@ -9,4 +9,6 @@ RUN go mod download
 COPY . .
 RUN go build -o meminders .
 
+EXPOSE 8080
+
 CMD ["./meminders"]
