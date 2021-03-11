@@ -90,15 +90,15 @@ func getReminders(db *gorm.DB) ([]Reminder, error) {
 }
 
 func (r *Reminder) matchesDay(t time.Time) bool {
-	if r.Frequency == "Daily" {
+	if r.Frequency == Daily {
 		return true
 	}
 
-	if r.Frequency == "Weekly" {
+	if r.Frequency == Weekly {
 		return r.DayOfWeek == t.Weekday().String()
 	}
 
-	if r.Frequency == "Monthly" {
+	if r.Frequency == Monthly {
 		return r.Day == t.Day()
 	}
 

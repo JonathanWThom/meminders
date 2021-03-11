@@ -29,7 +29,7 @@ func TestWatcherWatchReminders(t *testing.T) {
 		{
 			reminders: []Reminder{
 				{
-					Frequency: "Daily",
+					Frequency: Daily,
 					Hour:      time.Now().Hour(),
 					Minute:    time.Now().Minute(),
 					Second:    time.Now().Second() + 1,
