@@ -66,15 +66,12 @@ jobs:
           script: |
             docker login -u $GITHUB_ACTOR -p $GITHUB_TOKEN docker.pkg.github.com
 
-            # Stop running container
-            docker stop $(echo $IMAGE_NAME)
-
-            # Remove old container
-            docker rm $(echo $IMAGE_NAME)
-
             docker pull docker.pkg.github.com/jonathanwthom/meminders/meminders
 
-            # Run a new container from a new image
+            docker stop $(echo $IMAGE_NAME)
+
+            docker rm $(echo $IMAGE_NAME)
+
             docker run -d \
             --restart always \
             --env-file .env.production \
