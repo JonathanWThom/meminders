@@ -72,6 +72,8 @@ jobs:
             # Remove old container
             docker rm $(echo $IMAGE_NAME)
 
+            docker pull docker.pkg.github.com/jonathanwthom/meminders/meminders
+
             # Run a new container from a new image
             docker run -d \
             --restart always \
