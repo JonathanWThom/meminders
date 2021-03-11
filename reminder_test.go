@@ -1,8 +1,14 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 	"time"
+
+	"github.com/gin-gonic/gin"
 )
 
 func TestReminderMatchesDayAndTime(t *testing.T) {
@@ -67,6 +73,65 @@ func TestReminderMatchesDayAndTime(t *testing.T) {
 					actual,
 					test.expected,
 				)
+			}
+		})
+	}
+}
+
+func TestPostReminders(t *testing.T) {
+	tests := []struct {
+		description    string
+		params         map[string]interface{}
+		statusCode     int
+		remindersCount int
+	}{
+		{
+			description: "It returns 201 and creates a reminder when valid parameters are passed",
+			params: map[string]interface{}{
+				"message":   "test message",
+				"frequency": "Daily",
+				"hour":      1,
+				"minute":    2,
+				"zone":      "America/Los_Angeles",
+			},
+			statusCode:     201,
+			remindersCount: 1,
+		},
+	}
+
+	for _, test := range tests {
+		t.Run(test.description, func(t *testing.T) {
+			preReminders := []Reminder{}
+			db.Find(&preReminders)
+
+			payload, err := json.Marshal(test.params)
+			if err != nil {
+				t.Fatalf("Failed to build payload for params: %v", test.params)
+			}
+
+			req, err := http.NewRequest("POST", "localhost:8080/reminders", bytes.NewBuffer(payload))
+			if err != nil {
+				t.Fatalf("Failed to create request: %v", err)
+			}
+
+			rec := httptest.NewRecorder()
+			c, _ := gin.CreateTestContext(rec)
+			c.Request = req
+
+			postReminders(c)
+
+			res := rec.Result()
+			defer res.Body.Close()
+
+			if res.StatusCode != test.statusCode {
+				t.Errorf("postReminders expected status code %v, got %v", test.statusCode, res.StatusCode)
+			}
+
+			reminders := []Reminder{}
+			db.Find(&reminders)
+			remindersAdded := len(reminders) - len(preReminders)
+			if remindersAdded != test.remindersCount {
+				t.Errorf("postReminders expected %v reminders,  got %v", test.remindersCount, len(reminders))
 			}
 		})
 	}

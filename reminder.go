@@ -10,8 +10,6 @@ import (
 	"gorm.io/gorm"
 )
 
-// add some validations
-// make required?
 type Reminder struct {
 	gorm.Model
 
@@ -30,6 +28,7 @@ func postReminders(c *gin.Context) {
 	if err := c.ShouldBindJSON(&reminder); err != nil {
 		log.Errorf("Invalid arguments to POST /reminders: %v", err)
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		fmt.Println(err)
 		return
 	}
 	if err := db.Create(&reminder).Error; err != nil {

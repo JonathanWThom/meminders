@@ -107,7 +107,6 @@ func TestRouter(t *testing.T) {
 
 			if test.authorization {
 				req.SetBasicAuth(os.Getenv("ADMIN_USERNAME"), os.Getenv("ADMIN_PASSWORD"))
-				fmt.Println(req.Header)
 			}
 
 			res, err := client.Do(req)
