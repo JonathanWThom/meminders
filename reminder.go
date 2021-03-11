@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -10,16 +11,31 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	Daily   = "daily"
+	Monthly = "monthly"
+	Once    = "once"
+	Weekly  = "weekly"
+)
+
+var frequencies = []string{
+	Daily,
+	Monthly,
+	Once,
+	Weekly,
+}
+
 type Reminder struct {
 	gorm.Model
 
-	Message   string `json:"message" binding:"required"`
-	Frequency string `json:"frequency" binding:"required"`
 	Day       int    `json:"day"`
 	DayOfWeek string `json:"day_of_week"`
+	Frequency string `json:"frequency" binding:"required"`
 	Hour      int    `json:"hour" binding:"required"`
+	Message   string `json:"message" binding:"required"`
 	Minute    int    `json:"minute"`
 	Second    int    `json:"second"`
+	Year      int    `json:"year"`
 	Zone      string `json:"zone" binding:"required"`
 }
 
@@ -31,6 +47,19 @@ func postReminders(c *gin.Context) {
 		fmt.Println(err)
 		return
 	}
+
+	// Custom Validations
+	// TODO: Break these out into a function or use as tag if possible
+	// TODO: Validate right params given frequency
+	reminder.Frequency = strings.ToLower(reminder.Frequency)
+	_, ok := find(frequencies, reminder.Frequency)
+	if !ok {
+		err := fmt.Errorf("Invalid frequency: %v", reminder.Frequency)
+		log.Errorf("Failed to create reminder: %v", err)
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		return
+	}
+
 	if err := db.Create(&reminder).Error; err != nil {
 		log.Errorf("Failed to create reminder: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create reminder"})
