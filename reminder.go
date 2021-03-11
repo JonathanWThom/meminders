@@ -34,6 +34,7 @@ type Reminder struct {
 	Hour      int    `json:"hour" binding:"required"`
 	Message   string `json:"message" binding:"required"`
 	Minute    int    `json:"minute"`
+	Month     string `json:"month"`
 	Second    int    `json:"second"`
 	Year      int    `json:"year"`
 	Zone      string `json:"zone" binding:"required"`
@@ -89,7 +90,15 @@ func getReminders(db *gorm.DB) ([]Reminder, error) {
 	return reminders, nil
 }
 
+func (r *Reminder) matchesSingleDay(t time.Time) bool {
+	return r.Day == t.Day() && r.Month == t.Month().String() && r.Year == t.Year()
+}
+
 func (r *Reminder) matchesDay(t time.Time) bool {
+	if r.Frequency == Once {
+		return r.matchesSingleDay(t)
+	}
+
 	if r.Frequency == Daily {
 		return true
 	}
