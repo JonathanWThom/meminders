@@ -124,6 +124,7 @@ func (c *config) buildRouter() Router {
 		adminUsername: adminPassword,
 	}))
 	authorized.POST("/reminders", postReminders)
+	router.Any("/robots.txt", robotsHandler)
 
 	// Tarpit
 	tp = tarpit.New(
@@ -142,8 +143,11 @@ func (c *config) buildRouter() Router {
 	return router
 }
 
-func tarpitHandler(ctx *gin.Context) {
+func robotsHandler(ctx *gin.Context) {
+	ctx.String(http.StatusOK, "User-agent: * Disallow /")
+}
 
+func tarpitHandler(ctx *gin.Context) {
 	tp.Handler(ctx.Writer, ctx.Request)
 }
 
