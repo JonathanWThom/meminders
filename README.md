@@ -32,6 +32,10 @@ The API does not (yet!) do a great job of validating inputs, so make sure if you
 set something for a given frequency, you send it a sensical set of other
 parameters (e.g. if you want a weekly reminder, tell it what day of the week).
 
+An additional... "feature" is that I've set it up such that any request to a
+non-existant path will result a tarpit response (quasi-infinite streamed http
+response). You may not want this.
+
 ### Deployment
 
 There's a nice little [GitHub Actions workflow](https://github.com/JonathanWThom/meminders/blob/main/.github/workflows/go.yml) set up that you could use to put this thing on a server, if you were to fork the repo. You'd probably want to sub out any reference to `jonathanwthom` for your own username.
