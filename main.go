@@ -6,7 +6,10 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"runtime"
+	"time"
 
+	"github.com/die-net/http-tarpit/tarpit"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/kevinburke/twilio-go"
@@ -33,6 +36,8 @@ var watcher = Watcher{
 }
 
 var db *gorm.DB
+
+var tp *tarpit.Tarpit
 
 type Router interface {
 	Run(...string) error
@@ -120,7 +125,26 @@ func (c *config) buildRouter() Router {
 	}))
 	authorized.POST("/reminders", postReminders)
 
+	// Tarpit
+	tp = tarpit.New(
+		runtime.NumCPU(),
+		"text/html",
+		16*time.Second,
+		50*time.Millisecond,
+		1048576,
+		10485760,
+	)
+	if tp == nil {
+		log.Fatal("Unable to build tarpit")
+	}
+	router.NoRoute(tarpitHandler)
+
 	return router
+}
+
+func tarpitHandler(ctx *gin.Context) {
+
+	tp.Handler(ctx.Writer, ctx.Request)
 }
 
 func setUpDB() (*gorm.DB, error) {
