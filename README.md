@@ -36,6 +36,14 @@ parameters (e.g. if you want a weekly reminder, tell it what day of the week).
 
 There's a nice little [GitHub Actions workflow](https://github.com/JonathanWThom/meminders/blob/main/.github/workflows/go.yml) set up that you could use to put this thing on a server, if you were to fork the repo. You'd probably want to sub out any reference to `jonathanwthom` for your own username.
 
+One fun use case is to create a client for Meminders using Siri Shortcuts; this
+is what I've done, but there are probably other ways to make it useful.
+
+### Contributing
+
+I welcome any and all issues and PRs. The next priority for this
+project is to support more actions on saved reminders via API.
+
 ### License
 
 MIT
