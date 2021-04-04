@@ -12,7 +12,7 @@ type Watcher struct {
 	reminders []Reminder
 }
 
-func (w *Watcher) WatchReminders(client Sender) {
+func (w *Watcher) WatchReminders(client *CommsClient) {
 ticker:
 	for tick := range time.Tick(time.Second * 1) {
 		select {

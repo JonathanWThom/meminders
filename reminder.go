@@ -1,8 +1,10 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 
@@ -28,6 +30,7 @@ var frequencies = []string{
 type Reminder struct {
 	gorm.Model
 
+	Call      bool   `json:"call"`
 	Day       int    `json:"day"`
 	DayOfWeek string `json:"day_of_week"`
 	Frequency string `json:"frequency" binding:"required"`
@@ -129,11 +132,23 @@ func (r *Reminder) MatchesDayAndTime(tick time.Time) bool {
 	return r.matchesDay(t) && r.matchesTime(t)
 }
 
-func (r *Reminder) SendMessage(sender Sender, from string, to string) {
-	_, err := sender.SendMessage(from, to, r.Message, nil)
-	if err != nil {
-		log.Error("Failed to send reminder: ", err)
-		return
+func (r *Reminder) SendMessage(client *CommsClient, from string, to string) {
+	if r.Call == true {
+		data := url.Values{}
+		data.Set("From", twilioFromNumber)
+		data.Set("To", twilioToNumber)
+		msg := fmt.Sprintf(
+			"<Response><Say voice=\"Polly.Joanna\">%s</Say></Response>",
+			r.Message,
+		)
+		data.Set("Twiml", msg)
+		client.Calls.Create(context.Background(), data)
+	} else {
+		_, err := client.Messages.SendMessage(from, to, r.Message, nil)
+		if err != nil {
+			log.Error("Failed to send reminder: ", err)
+			return
+		}
 	}
 
 	log.Info("Reminder sent: ", r)

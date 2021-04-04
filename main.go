@@ -52,8 +52,17 @@ type config struct{}
 
 var appConfig Config
 
+type CommsClient struct {
+	Messages Sender
+	Calls    Caller
+}
+
 type Sender interface {
 	SendMessage(string, string, string, []*url.URL) (*twilio.Message, error)
+}
+
+type Caller interface {
+	Create(context.Context, url.Values) (*twilio.Call, error)
 }
 
 func init() {
@@ -98,7 +107,7 @@ func Run() error {
 		return err
 	}
 
-	client := setUpSMSClient()
+	client := setUpCommunicationsClient()
 
 	reminders, err := getReminders(db)
 	if err != nil {
@@ -167,10 +176,10 @@ func setUpDB() (*gorm.DB, error) {
 	return db, nil
 }
 
-func setUpSMSClient() *twilio.MessageService {
-	log.Info("Initializing SMS client...")
+func setUpCommunicationsClient() *CommsClient {
+	log.Info("Initializing Communications client...")
 	client := twilio.NewClient(twilioAccountSID, twilioAuthToken, nil)
-	log.Info("SMS client initialized")
+	log.Info("Communcations client initialized")
 
-	return client.Messages
+	return &CommsClient{Calls: client.Calls, Messages: client.Messages}
 }
