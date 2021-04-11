@@ -1,6 +1,6 @@
 # Meminders
 
-A little reminders program. Meminders will send you text messages to remind you
+A little reminders program. Meminders will send you text messages (or call you!) to remind you
 of things.
 
 ### Development
@@ -9,7 +9,7 @@ There are a few primary dependencies to Meminders:
 1. Go (though you can run it with Docker as well), and all the Go packages
    specified in [go.mod](https://github.com/JonathanWThom/meminders/blob/main/go.mod).
 2. SQLite (though this could easily be swapped out).
-3. Twilio (for sending text messages).
+3. Twilio (for sending text messages and making calls).
 
 Check out the [test.env file](https://github.com/JonathanWThom/meminders/blob/main/.env.test) to see what environment variables you'll need. The program will also blow up if any are lacking, so that helps.
 
@@ -31,6 +31,9 @@ The program supports frequencies of "once", "daily", "weekly", and "monthly".
 The API does not (yet!) do a great job of validating inputs, so make sure if you
 set something for a given frequency, you send it a sensical set of other
 parameters (e.g. if you want a weekly reminder, tell it what day of the week).
+
+By default, reminders will be sent via SMS. But you can add the call parameter to the
+body (`"call": true`) to receive a phone call instead.
 
 An additional... "feature" is that I've set it up such that any request to a
 non-existant path will result a tarpit response (quasi-infinite streamed http
