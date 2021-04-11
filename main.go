@@ -52,9 +52,22 @@ type config struct{}
 
 var appConfig Config
 
+type Client interface {
+	Messages() Sender
+	Calls() Caller
+}
+
 type CommsClient struct {
-	Messages Sender
-	Calls    Caller
+	messages Sender
+	calls    Caller
+}
+
+func (c *CommsClient) Messages() Sender {
+	return c.messages
+}
+
+func (c *CommsClient) Calls() Caller {
+	return c.calls
 }
 
 type Sender interface {
@@ -176,10 +189,10 @@ func setUpDB() (*gorm.DB, error) {
 	return db, nil
 }
 
-func setUpCommunicationsClient() *CommsClient {
+func setUpCommunicationsClient() Client {
 	log.Info("Initializing Communications client...")
 	client := twilio.NewClient(twilioAccountSID, twilioAuthToken, nil)
 	log.Info("Communcations client initialized")
 
-	return &CommsClient{Calls: client.Calls, Messages: client.Messages}
+	return &CommsClient{calls: client.Calls, messages: client.Messages}
 }
