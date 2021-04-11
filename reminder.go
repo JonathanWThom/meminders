@@ -133,8 +133,8 @@ func (r *Reminder) MatchesDayAndTime(tick time.Time) bool {
 }
 
 func (r *Reminder) SendMessage(client Client, from string, to string) {
-	fmt.Println(r.Call)
-	if r.Call == true {
+	if r.Call {
+		log.Infof("Calling reminder from %v to %v...\n", twilioFromNumber, twilioToNumber)
 		data := url.Values{}
 		data.Set("From", twilioFromNumber)
 		data.Set("To", twilioToNumber)
@@ -143,8 +143,13 @@ func (r *Reminder) SendMessage(client Client, from string, to string) {
 			r.Message,
 		)
 		data.Set("Twiml", msg)
-		client.Calls().Create(context.Background(), data)
+		_, err := client.Calls().Create(context.Background(), data)
+		if err != nil {
+			log.Error("Failed to send reminder: ", err)
+			return
+		}
 	} else {
+		log.Infof("Sending reminder via SMS from %v to %v...\n", twilioFromNumber, twilioToNumber)
 		_, err := client.Messages().SendMessage(from, to, r.Message, nil)
 		if err != nil {
 			log.Error("Failed to send reminder: ", err)
