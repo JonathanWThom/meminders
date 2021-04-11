@@ -81,3 +81,5 @@ jobs:
             -v $(pwd)/.env.production:/app/.env.production \
             -p 80:8080 \
             docker.pkg.github.com/jonathanwthom/meminders/meminders:$(echo $GITHUB_SHA)
+
+            docker images -a | grep -v $(echo $GITHUB_SHA) | awk '{print $3}' | xargs docker rmi
